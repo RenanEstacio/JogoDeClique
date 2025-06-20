@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Cliques - Exemplo de Monetização</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- PASSO 1: CÓDIGO GERAL DO GOOGLE ADSENSE -->
+    <!-- Após a aprovação, o Google AdSense fornecerá um código <script> para ser colocado aqui, no <head> do seu site. -->
+    <!-- Exemplo: <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-SEU_ID_DE_CLIENTE" crossorigin="anonymous"></script> -->
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Este contêiner agora pode ser estilizado pelo próprio AdSense */
+        .ad-placeholder {
+            background-color: #333;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            text-align: center;
+            border-radius: 0.5rem;
+            min-height: 250px; 
+            transition: all 0.3s ease;
+        }
+        .click-button {
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+        }
+        .click-button:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-md mx-auto bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8 text-center">
+
+        <h1 class="text-3xl md:text-4xl font-bold text-cyan-400 mb-2">Jogo de Cliques!</h1>
+        <p class="text-gray-400 mb-6">Clique no botão para marcar pontos.</p>
+
+        <div class="bg-gray-700 rounded-lg p-4 mb-6">
+            <p class="text-lg text-gray-300">Sua Pontuação:</p>
+            <p id="score" class="text-5xl font-bold text-white">0</p>
+        </div>
+
+        <button id="clickButton" class="click-button w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-4 px-6 rounded-lg text-2xl shadow-lg focus:outline-none focus:ring-4 focus:ring-cyan-300 mb-6">
+            Clique Aqui!
+        </button>
+        
+        <button id="watchAdButton" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-5 rounded-lg text-lg shadow-lg focus:outline-none focus:ring-4 focus:ring-indigo-300 mb-6 opacity-50 cursor-not-allowed" disabled>
+            Assistir Anúncio por +50 Pontos
+        </button>
+
+        <!-- Espaço onde o anúncio será exibido -->
+        <div id="adContainer" class="mt-4 hidden">
+            <h3 class="text-lg font-semibold mb-2 text-gray-400">Anúncio</h3>
+            
+            <!-- PASSO 2: CÓDIGO DO BLOCO DE ANÚNCIO DO ADSENSE -->
+            <!-- Você substituiria o div 'adPlaceholder' abaixo pelo código do bloco de anúncio fornecido pelo AdSense. -->
+            <!-- Ele será parecido com isso: -->
+            <!-- 
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-SEU_ID_DE_CLIENTE"
+                 data-ad-slot="SEU_ID_DO_BLOCO_DE_ANUNCIO"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script> 
+            -->
+            <div id="adPlaceholder" class="ad-placeholder p-4">
+                Seu anúncio real apareceria aqui!
+            </div>
+            <!-- Para anúncios bonificados (rewarded), a API do AdSense cuidaria do botão de fechar e de avisar quando a recompensa deve ser dada. -->
+            <!-- Por isso, nosso botão 'closeAdButton' foi removido do HTML. -->
+        </div>
+        
+        <div id="feedbackMessage" class="mt-4 text-green-400 font-semibold h-6"></div>
+
+    </div>
+
+    <script>
+        const scoreElement = document.getElementById('score');
+        const clickButton = document.getElementById('clickButton');
+        const watchAdButton = document.getElementById('watchAdButton');
+        const adContainer = document.getElementById('adContainer');
+        const feedbackMessage = document.getElementById('feedbackMessage');
+
+        let score = 0;
+        let adReadyAfterClicks = 15;
+
+        function updateScore() {
+            scoreElement.textContent = score;
+        }
+
+        clickButton.addEventListener('click', () => {
+            score++;
+            updateScore();
+            
+            if (score > 0 && score % adReadyAfterClicks === 0) {
+                watchAdButton.disabled = false;
+                watchAdButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                feedbackMessage.textContent = 'Recompensa de anúncio disponível!';
+            }
+        });
+
+        watchAdButton.addEventListener('click', () => {
+            watchAdButton.disabled = true;
+            watchAdButton.classList.add('opacity-50', 'cursor-not-allowed');
+
+            // --- PONTO DE INTEGRAÇÃO REAL ---
+            // Aqui, em vez de apenas mostrar nosso container, você chamaria a função da API de anúncios
+            // para exibir um anúncio bonificado.
+            console.log("Iniciando a exibição do anúncio real...");
+            
+            // 1. Mostre o container do anúncio
+            adContainer.classList.remove('hidden');
+            
+            // 2. Chame a função do AdSense para carregar um anúncio no bloco.
+            // (adsbygoogle = window.adsbygoogle || []).push({});
+
+            // 3. A API de anúncios bonificados terá uma função de "callback"
+            // que é chamada quando o usuário termina de ver o anúncio.
+            // Você colocaria a chamada para handleAdReward() dentro desse callback.
+            // Para simular, vamos chamar após 5 segundos.
+            feedbackMessage.textContent = "Simulando visualização de anúncio...";
+            setTimeout(() => {
+                handleAdReward();
+                adContainer.classList.add('hidden'); // Esconde o anúncio após a recompensa.
+            }, 5000); 
+        });
+        
+        function handleAdReward() {
+            const bonusPoints = 50;
+            score += bonusPoints;
+            updateScore();
+            console.log(`Usuário ganhou ${bonusPoints} pontos de bônus!`);
+            
+            feedbackMessage.textContent = `Você ganhou +${bonusPoints} pontos!`;
+            setTimeout(() => {
+                feedbackMessage.textContent = '';
+            }, 3000);
+        }
+
+        updateScore();
+    </script>
+
+</body>
+</html>
